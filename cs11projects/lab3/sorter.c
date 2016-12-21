@@ -10,9 +10,6 @@
 */
 #define LENGTH(x) (sizeof(x) / sizeof((x)[0]))
 
-/* C is pass-by-value! so I can pass a function an array, modify it, and the array will stay modified. */
-/* this function will sort an array of numbers. I will use selection sort. */
-
 void sorter(int array[], int length){
     /*the macro LENGTH will not work here since the array is passed as a parameter
       the parameter is treated as a pointer, so sizeof gets the pointer's size
