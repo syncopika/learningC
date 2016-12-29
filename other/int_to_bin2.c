@@ -1,12 +1,11 @@
 /* integer to binary converter (up to 32 places)*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #define BYTES 33
 
 /* prototypes */
 char *intToBinary(int num);
-void reverse(char **string);
+void reverse(char *string);
 
 /* converting function */
 char *intToBinary(int num)
@@ -47,16 +46,15 @@ char *intToBinary(int num)
 
 }
 
-/* helpful? http://stackoverflow.com/questions/5611832/changing-an-array-with-a-function-in-c */
-void reverse(char **string)
+void reverse(char *string)
 {
 	int i;
 	char temp;
 
 	for(i = 0; i < (BYTES-2)/2; i++){
-		temp = *(*string + i);
-		*(*string + i) = *(*string + BYTES - 2 - i);
-		*(*string + BYTES - 2 - i) = temp;
+		temp = string[i];
+		string[i] = string[BYTES - 2 - i];
+		string[BYTES - 2 - i] = temp;
 	}
 }
 
@@ -69,16 +67,10 @@ int main(void)
 	scanf("%d", &n);
 	
 	str = intToBinary(n);
-	reverse(&str); /* &str = pointer of a pointer -> &str points to str, which points to char array */
+	reverse(str);
 
 	printf("the binary representation of %d is:\n%s \n", n, str);
 	
-	/* print it this way if only int types in array
-	int i;
-	for(i = 0; i < length; i++){
-		printf("%d", str[i]);
-	}
-	*/
 	
 	free(str); /* free allocated memory */
 	return 0;
