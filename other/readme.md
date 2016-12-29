@@ -9,4 +9,8 @@ Since '%s' looks at chars, and the bit representation of '0' is 110000 (ASCII 48
 -if you want to edit some elements in a pointer (i.e. char array) within a function, you should have that function accept a pointer-to-a-pointer as an argument.
 Then once inside the function, dereference the argument to actually access the array.    
     
--a variable can become a pointer by attaching '&' in front, meaning 'address-of'. 
+-a variable can become a pointer by attaching '&' in front, meaning 'address-of'.    
+    
+In int_to_binary, I used a for-loop to print out all the bits of the binary number. I also put in all the bits into the char array as integers.    
+    
+In int_to_bin2, I put all the bits as characters in the array and was able to print the binary number in one string. 
