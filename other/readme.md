@@ -6,8 +6,8 @@ some things I've learned:
 Since '%s' looks at chars, and the bit representation of '0' is 110000 (ASCII 48), each index is not '0' as I initially thought would happen.
 <a href='http://stackoverflow.com/questions/17975575/difference-between-binary-zeros-and-ascii-character-zero'> This </a> is helpful.    
     
--if you want to edit some elements in a pointer (i.e. char array) within a function, you should have that function accept a pointer-to-a-pointer as an argument.
-Then once inside the function, dereference the argument to actually access the array.    
+-if you want to change the contents of a pointer within a function, you should have that function accept a pointer-to-a-pointer as an argument.
+Then once inside the function, dereference the argument to actually access the array. I haven't done this yet, but came across it as I was looking for answers. Probably good to know.    
     
 -a variable can become a pointer by attaching '&' in front, meaning 'address-of'.    
     
