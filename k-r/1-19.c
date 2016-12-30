@@ -10,7 +10,6 @@ int getLength(char *s){
 	int length = 0;
 	
 	while(s[length] != '\0'){
-		/* printf("the char is: %c\n", s[length]); */
 		++length;
 	}
 	
@@ -20,28 +19,22 @@ int getLength(char *s){
 
 void reverse(char s[])
 {
-
-	/* int length = sizeof(s) / sizeof(s[0]); */
-	
 	int i;
 	int j = getLength(s) - 1; /* decrement by 1 to account for the 0th index */
-	/* printf("length is: %d\n", j); */
 	
 	for(i = 0; i < j; i++, j--){
 		
 		char temp = s[i];
 		s[i] = s[j];
 		s[j] = temp;
-		
 	}
 
 }
 
-
 int main(void){
 
 	char c;
-	char strArr[50] = {'\0'};
+	char strArr[50] = {'\0'}; /* every index is set to '\0' initially */
 	int marker = 0;
 	
 	while((c = getchar()) != '\n'){
@@ -51,10 +44,12 @@ int main(void){
 
 	reverse(strArr);
 	
+	printf("%s\n", strArr);
+	/*
 	int i = 0;
 	for(i = 0; i < marker; i++){
 		printf("%c", strArr[i]);
-	}
+	}*/
 
 	return 0;
 
