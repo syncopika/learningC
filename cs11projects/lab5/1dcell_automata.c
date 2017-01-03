@@ -5,8 +5,8 @@
 
 /* defined what should represent full or empty cells */
 /* when adding '0' to make a character, it's the same as adding 48 in decimal. 48 + -6 = 42, which is the asterisk char. */ 
-#define FULL -6 
-#define EMPTY -2
+#define FULL (-6 + '0')
+#define EMPTY (-2 + '0')
 
 
 /* function prototypes */
@@ -19,7 +19,7 @@ int changeCell(char cell, char left, char right);
 /* set up array */
 void setArray(char *array, int length){
 	
-	array[0] = EMPTY + '0';
+	array[0] = EMPTY;
 	array[length - 1] = '\0'; /* null terminate */
 	
 	/* random number generator */
@@ -32,9 +32,9 @@ void setArray(char *array, int length){
 		/* randomly set indices to either 0 or 1 */
 		random = (rand()%10) + 1; /* pick a number from 1 to 10 */
 		if(random > 5){
-			array[i] = FULL + '0';
+			array[i] = FULL;
 		}else{
-			array[i] = EMPTY + '0';
+			array[i] = EMPTY;
 		}
 	}
 }
@@ -43,12 +43,12 @@ void setArray(char *array, int length){
 /* determine if current cell should be changed */
 int changeCell(char cell, char left, char right)
 {	
-	int neighborsFull = (left == (FULL + '0') && right == (FULL + '0'));
-	int oneNeighborFull = (left == (FULL + '0') || right == (FULL + '0'));
+	int neighborsFull = (left == FULL && right == FULL);
+	int oneNeighborFull = (left == FULL || right == FULL);
 	
-	if(cell == EMPTY + '0' && neighborsFull){
+	if(cell == EMPTY && neighborsFull){
 		return 0;
-	}else if(cell == EMPTY + '0' && oneNeighborFull){
+	}else if(cell == EMPTY && oneNeighborFull){
 		return 1; /* this is the condition to change currernt cell */
 	}else{
 		return 0;
@@ -63,9 +63,9 @@ void update(char *arr1, char *arr2, int length)
 	/* figure out what next generation will look like. put it in arr2 */
 	for(i = 1; i < length-1; i++){
 		if(changeCell(arr1[i], arr1[i-1], arr1[i+1]) == 1){
-			arr2[i] = FULL + '0';
+			arr2[i] = FULL;
 		}else{
-			arr2[i] = EMPTY + '0';
+			arr2[i] = EMPTY;
 		}
 	}
 	
