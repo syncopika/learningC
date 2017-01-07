@@ -13,4 +13,13 @@ Then once inside the function, dereference the pointer-to-pointer to actually ac
     
 In int_to_binary, I used a for-loop to print out all the bits of the binary number. I also put in all the bits into the char array as integers.    
     
-In int_to_bin2, I put all the bits as characters in the array and was able to print the binary number in one string. 
+In int_to_bin2, I put all the bits as characters in the array and was able to print the binary number in one string.    
+    
+----------------
+ROT13 cipher    
+ ==================    
+-learned about reading and writing files.    
+
+-created a function that rotates letters 13 places to encode and another to decode by applying the reverse.  
+
+-the EOF of a file should be considered an int and not a char.
