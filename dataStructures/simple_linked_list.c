@@ -32,14 +32,15 @@ typedef struct linkedlist
 	function prototypes 
 */
 void initializeList(LList *list);
-void addToHead(LList **list, int n);
-void addToTail(LList **list, int n);
+void addToHead(LList *list, int n);
+void addToTail(LList *list, int n);
 int getLength(LList *list);
 int getHead(LList *list);
 int getTail(LList *list);
 void printList(LList *list);
-void freeList(LList **list);
+void freeList(LList *list);
 void removeNode(LList *list, int n);
+int search(LList *list, int data);
 
 /* 
 	functions 
@@ -52,7 +53,10 @@ void initializeList(LList *list){
 
 }
 
-void addToHead(LList **list, int n){
+/*
+*  add node to head of list
+*/
+void addToHead(LList *list, int n){
 
 	/* allocate some memory for new node */
 	Node *newNode = malloc(sizeof(Node));
@@ -67,23 +71,26 @@ void addToHead(LList **list, int n){
 	newNode->value = n;
 	
 	/* move the old head (only if there's a node there already) as the next for this node's next */
-	if((*list)->head == NULL){
+	if((list)->head == NULL){
 		/* initialize newNode next to NULL if it's the first node */
 		(newNode->next) = NULL; 
 		/* and make the tail pointer point to new node */
-		(*list)->tail = newNode;
+		(list)->tail = newNode;
 	}else{
-		(newNode->next) = (*list)->head;
+		(newNode->next) = (list)->head;
 	}
 	
 	/* reassign list's head to this new node */
-	(*list)->head = newNode;
+	(list)->head = newNode;
 	
 	/* increment length */
-	((*list)->length) = ((*list)->length) + 1;
+	((list)->length) = ((list)->length) + 1;
 }
 
-void addToTail(LList **list, int n){
+/*
+*  add node to tail of list
+*/
+void addToTail(LList *list, int n){
 	
 	Node *newNode = malloc(sizeof(Node));
 	
@@ -94,16 +101,16 @@ void addToTail(LList **list, int n){
 	
 	newNode->value = n;
 	
-	if((*list)->tail == NULL){
-		(*list)->head = newNode;
-		(*list)->tail = newNode;
+	if((list)->tail == NULL){
+		(list)->head = newNode;
+		(list)->tail = newNode;
 	}else{
-		((*list)->tail)->next = newNode;
-		(*list)->tail = newNode;
+		((list)->tail)->next = newNode;
+		(list)->tail = newNode;
 	}
 	
 	newNode->next = NULL;
-	((*list)->length) = ((*list)->length) + 1;
+	((list)->length) = ((list)->length) + 1;
 }
 
 /* removes only first occurrence of n */
@@ -156,7 +163,9 @@ void removeNode(LList *list, int n){
 	}
 }
 
-
+/*
+* print the list
+*/
 void printList(LList *list){
 
 	Node *n;
@@ -168,10 +177,16 @@ void printList(LList *list){
 	}
 }
 
+/*
+*  get the head of the list
+*/
 int getHead(LList *list){
 	return (list->head)->value;
 }
 
+/*
+*  get the tail of the list
+*/
 int getTail(LList *list){
 	return (list->tail)->value;
 }
@@ -180,20 +195,36 @@ int getTail(LList *list){
    sometimes it returns the correct value, and sometimes the mem address??
 */
 int getLength(LList *list){
-	return (list->length);
+	return list->length;
 }
 
-void freeList(LList **list){
+/*
+*  free the list
+*/
+void freeList(LList *list){
 
 	Node *n;
 	
-	while(((*list)->head) != NULL){
-		n = (*list)->head;
-		(*list)->head = n->next;
+	while((list->head) != NULL){
+		n = list->head;
+		list->head = n->next;
 		free(n);
 	}
 }
 
+/*
+*  search the list for a particular datum
+*/
+int search(LList *list, int data){
+	Node *n = list->head;
+	while(n != NULL){
+		if(n->value == data){
+			return 1;
+		}
+		n = n->next; 
+	}
+	return 0;
+}
 
 int main(void){
 	
@@ -202,14 +233,14 @@ int main(void){
 
 	initializeList(newList);
 	
-	addToHead(&newList, 10);
-	addToHead(&newList, 11);
-	addToHead(&newList, 12);
-	addToHead(&newList, 13);
-	addToHead(&newList, 14);
-	addToHead(&newList, 15);
-	addToTail(&newList, 20);
-	addToTail(&newList, 25);
+	addToHead(newList, 10);
+	addToHead(newList, 11);
+	addToHead(newList, 12);
+	addToHead(newList, 13);
+	addToHead(newList, 14);
+	addToHead(newList, 15);
+	addToTail(newList, 20);
+	addToTail(newList, 25);
 	
 	printList(newList);
 	printf("the head is: %d\n", getHead(newList));
@@ -225,7 +256,13 @@ int main(void){
 	printf("the tail is now: %d\n", getTail(newList));
 	printf("The length of the list is now: %d\n", getLength(newList));
 	
-	freeList(&newList);
+	/* does the list have 20? yes */
+	printf("the list has 20: %d\n", search(newList, 20));
+	
+	/* does the list have 25? no */
+	printf("the list has 25: %d\n", search(newList, 25));
+	
+	freeList(newList);
 
 	return 0;
 
