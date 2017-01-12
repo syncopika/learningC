@@ -27,7 +27,7 @@ void addNode(BST *tree, int value);
 void addHelper(Node *n, int value);
 
 void removeNode(BST *tree, int value);
-void removeHelper(Node *n, int value);
+void removeHelper(BST *tree, Node *n, int value);
 
 Node *getMax(Node *n);
 Node *getMin(Node *n);
@@ -107,12 +107,12 @@ void removeNode(BST *tree, int value){
 		return;
 	}
 	
-	/* if tree has more than 1 node */
-	removeHelper(n, value);
+	/* if tree has more than 2 nodes */
+	removeHelper(tree, n, value);
 }
 
 /* remove helper */
-void removeHelper(Node *n, int value){
+void removeHelper(BST *tree, Node *n, int value){
 
 	if(n == NULL){
 		return;
@@ -127,7 +127,6 @@ void removeHelper(Node *n, int value){
 			return;
 		}
 	}
-	
 	if(n->right != NULL){
 		if(n->right->value == value && isLeaf(n->right)){
 			/* free that right node */
@@ -141,22 +140,39 @@ void removeHelper(Node *n, int value){
 	if(!isLeaf(n) && (n->value == value)){
 		/* replace the current node's value with either the MAX value from the left subtree, or
 		the MIN value from the right subtree, whichever is available. */
-		Node *max = getMax(n);
-		Node *min = getMin(n);
+		Node *max = getMax(n->left);
+		Node *min = getMin(n->right);
 		if(max != NULL){
 			/* replacing value */
 			n->value = max->value;
 			/* now use recursion to remove that value used to replace the current node's */
+			/* 
+			   after replacing its value, 
+			   if the left or right node shares the same target value as the current node's,
+			   start the recursion at the current node again
+			   
+			   otherwise move on at the left or right node, depending
+			   on which subtree the replacement value is from. 
+			 */
+			if(n->left->value == n->value){
+				removeHelper(tree, n, n->value);
+			}else{
+				removeHelper(tree, n->left, n->value);
+			}
 		}else if(min != NULL){
 			n->value = min->value;
+			if(n->right->value == n->value){
+				removeHelper(tree, n, n->value);
+			}else{
+				removeHelper(tree, n->right, n->value);
+			}
 		}
-		removeHelper(n, n->value);
 	}else{
 		if(value <= (n->value)){
 			/* if the value to look for is less than current node's value, go left */
-			removeHelper(n->left, value);
+			removeHelper(tree, n->left, value);
 		}else if(value > (n->value)){
-			removeHelper(n->right, value);
+			removeHelper(tree, n->right, value);
 		}
 	}
 }
@@ -165,6 +181,10 @@ void removeHelper(Node *n, int value){
    returns a pointer to the node with the max value
 */
 Node *getMax(Node *n){
+	
+	if(n == NULL){
+		return NULL;
+	}
 	
 	Node *node = n;
 	
@@ -179,6 +199,10 @@ Node *getMax(Node *n){
    returns a pointer to the node with the min value
 */
 Node *getMin(Node *n){
+	
+	if(n == NULL){
+		return NULL;
+	}
 	
 	Node *node = n;
 	
@@ -303,18 +327,19 @@ int main(void){
 	BST *bst = calloc(1, sizeof(BST));
 	
 	addNode(bst, 5);
-	addNode(bst, 6);
-	addNode(bst, 3);
 	addNode(bst, 2);
+	addNode(bst, 3);
+	addNode(bst, 7);
+
 	printTree(bst);
 	
 	printf("removing node...\n");
-	removeNode(bst, 2);
+	removeNode(bst, 5);
 	printTree(bst);
 	
 	freeTree(bst);
 
-	print_memory_leaks(); /* function from memcheck */
+	print_memory_leaks();
 	
 	return 0;
 	
