@@ -149,19 +149,20 @@ void removeHelper(Node *n, int value){
 			/* 
 			   after replacing its value, 
 			   if the left or right node shares the same target value as the current node's,
+			   AND only if that left or right node is a leaf
 			   start the recursion at the current node again
 			   
 			   otherwise move on at the left or right node, depending
 			   on which subtree the replacement value is from. 
 			 */
-			if(n->left->value == n->value){
+			if(n->left->value == n->value && isLeaf(n->left)){
 				removeHelper(n, n->value);
 			}else{
 				removeHelper(n->left, n->value);
 			}
 		}else if(min != NULL){
 			n->value = min->value;
-			if(n->right->value == n->value){
+			if(n->right->value == n->value && isLeaf(n->right)){
 				removeHelper(n, n->value);
 			}else{
 				removeHelper(n->right, n->value);
@@ -327,15 +328,16 @@ int main(void){
 	BST *bst = calloc(1, sizeof(BST));
 	
 	addNode(bst, 5);
-	addNode(bst, 2);
+	addNode(bst, 4);
 	addNode(bst, 3);
-	addNode(bst, 7);
+	addNode(bst, 2);
 	addNode(bst, 1);
 
 	printTree(bst);
 	
 	printf("removing node...\n");
-	removeNode(bst, 1);
+	removeNode(bst, 5);
+	removeNode(bst, 2);
 	printTree(bst);
 	
 	freeTree(bst);
