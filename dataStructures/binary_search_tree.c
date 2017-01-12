@@ -27,7 +27,7 @@ void addNode(BST *tree, int value);
 void addHelper(Node *n, int value);
 
 void removeNode(BST *tree, int value);
-void removeHelper(BST *tree, Node *n, int value);
+void removeHelper(Node *n, int value);
 
 Node *getMax(Node *n);
 Node *getMin(Node *n);
@@ -108,11 +108,11 @@ void removeNode(BST *tree, int value){
 	}
 	
 	/* if tree has more than 2 nodes */
-	removeHelper(tree, n, value);
+	removeHelper(n, value);
 }
 
 /* remove helper */
-void removeHelper(BST *tree, Node *n, int value){
+void removeHelper(Node *n, int value){
 
 	if(n == NULL){
 		return;
@@ -155,24 +155,24 @@ void removeHelper(BST *tree, Node *n, int value){
 			   on which subtree the replacement value is from. 
 			 */
 			if(n->left->value == n->value){
-				removeHelper(tree, n, n->value);
+				removeHelper(n, n->value);
 			}else{
-				removeHelper(tree, n->left, n->value);
+				removeHelper(n->left, n->value);
 			}
 		}else if(min != NULL){
 			n->value = min->value;
 			if(n->right->value == n->value){
-				removeHelper(tree, n, n->value);
+				removeHelper(n, n->value);
 			}else{
-				removeHelper(tree, n->right, n->value);
+				removeHelper(n->right, n->value);
 			}
 		}
 	}else{
 		if(value <= (n->value)){
 			/* if the value to look for is less than current node's value, go left */
-			removeHelper(tree, n->left, value);
+			removeHelper(n->left, value);
 		}else if(value > (n->value)){
-			removeHelper(tree, n->right, value);
+			removeHelper(n->right, value);
 		}
 	}
 }
@@ -330,11 +330,12 @@ int main(void){
 	addNode(bst, 2);
 	addNode(bst, 3);
 	addNode(bst, 7);
+	addNode(bst, 1);
 
 	printTree(bst);
 	
 	printf("removing node...\n");
-	removeNode(bst, 5);
+	removeNode(bst, 1);
 	printTree(bst);
 	
 	freeTree(bst);
