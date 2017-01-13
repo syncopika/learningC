@@ -8,11 +8,8 @@
 	queue only has two methods - add and getSmallest
 
 */
-
-
 #include <stdio.h>
 #include <stdlib.h>
-#include "memcheck.h"
 
 /* type definitions */
 typedef struct hash_map{
@@ -173,6 +170,8 @@ void removeSmallest(Heap *aHeap){
 	}
 	/* decrease currIndex */
 	(aHeap->currIndex)--;
+	/* decrease size */
+	(aHeap->size)--;
 }
 
 
@@ -217,10 +216,9 @@ int main(void){
 	removeSmallest(heap1);
 	
 	printHeap(heap1);
+	printf("the size of the heap is now: %d\n", heap1->size);
 	
 	freeHeap(heap1);
-	
-	print_memory_leaks();
 	
 	return 0;
 }
