@@ -1,5 +1,5 @@
 /*
-	priority queue (min heap)
+	trying to implement a priority queue (min heap)
 	
 	hashmaps will be put in the queue based on value
 	key - a char* array (string) indicating a certain activity (i.e. "do homework")
@@ -9,9 +9,9 @@
 
 */
 
-
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "heap.h"
 
 /*
@@ -23,7 +23,19 @@ HashMap *createNewHashMap(char *string, int priority){
 
 	HashMap *newHash = calloc(1, sizeof(HashMap));
 	
-	newHash->key = string;
+	if(newHash == NULL){
+		fprintf(stderr, "hash map could not be created.\n");
+		exit(1);
+	}
+	
+	newHash->key = malloc(sizeof(string) + 1);
+	
+	if(newHash->key == NULL){
+		fprintf(stderr, "hash map could not be created.\n");
+		exit(1);
+	}
+	
+	strcpy(newHash->key, string);
 	newHash->value = priority;
 	
 	return newHash;
@@ -41,6 +53,13 @@ Heap *newHeap(void){
 	newHeap->currIndex = 0;
 	
 	return newHeap;
+}
+
+/* set up a min-heap for adding new tasks */
+/* create heap here */
+void init(Heap **a_heap){
+	*a_heap = newHeap();
+	fprintf(stdout, "initializing heap...\n");
 }
 
 
@@ -103,8 +122,8 @@ void addToHeap(Heap *aHeap, HashMap *aHashMap){
 	gets the key from the smallest value hash map from heap.
 	doesn't change the heap.
 */
-void getSmallest(Heap *aHeap){
-	printf("The current task is: %s\n", aHeap->theHeap[0]->key);
+char *getSmallest(Heap *aHeap){
+	return aHeap->theHeap[0]->key;
 }
 
 /*
@@ -147,6 +166,7 @@ void freeHeap(Heap *h){
 	
 	int i;
 	for(i = 0; i < h->currIndex; i++){
+		free((h->theHeap)[i]->key);
 		free((h->theHeap)[i]);
 	}
 	free(h->theHeap);
@@ -159,9 +179,38 @@ void printHeap(Heap *h){
 	for(i = 0; i < h->currIndex; i++){
 		printf("to do: %s, priority number: %d\n", (h->theHeap)[i]->key, (h->theHeap)[i]->value);
 	}
-	
 }
 
+/*
+int main(void){
+	
+	Heap *heap1 = newHeap();
+	
+	HashMap *hm1 = createNewHashMap("do homework", 5);
+	HashMap *hm2 = createNewHashMap("eat food", 4);
+	HashMap *hm3 = createNewHashMap("go to sleep", 3);
+	HashMap *hm4 = createNewHashMap("play with cats", 2);
+	HashMap *hm5 = createNewHashMap("make music", 1);
+	
+	addToHeap(heap1, hm1);
+	addToHeap(heap1, hm4);
+	addToHeap(heap1, hm3);
+	addToHeap(heap1, hm5);
+	addToHeap(heap1, hm2);
+	
+	printHeap(heap1);
+	
+	getSmallest(heap1);
+	removeSmallest(heap1);
+	
+	printHeap(heap1);
+	printf("the size of the heap is now: %d\n", heap1->size);
+	
+	freeHeap(heap1);
+	
+	return 0;
+}
+*/
 
 
 
