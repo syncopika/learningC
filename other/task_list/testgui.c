@@ -11,15 +11,47 @@ gcc -Wall -mwindows testgui.c gui.o -o testgui.exe
 */
 
 #include <windows.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "resource.h"
+#include "heap2.h"
 
 const char g_szClassName[] = "myWindowClass";
 
+static Heap *my_heap; /* this variable does not stay updated! */
+static HashMap *temp;
+
+/* this is a bit verbose for my purposes... 
+   but the important part is AllocConsole()
+
+#include <io.h>
+#include <fcntl.h>
+
+int APIENTRY WinMain(HINSTANCE hInstance,
+                     HINSTANCE hPrevInstance,
+                     LPSTR     lpCmdLine,
+                     int       nCmdShow)
+{
+    AllocConsole();
+
+    HANDLE handle_out = GetStdHandle(STD_OUTPUT_HANDLE);
+    int hCrt = _open_osfhandle((long) handle_out, _O_TEXT);
+    FILE* hf_out = _fdopen(hCrt, "w");
+    setvbuf(hf_out, NULL, _IONBF, 1);
+    *stdout = *hf_out;
+
+    HANDLE handle_in = GetStdHandle(STD_INPUT_HANDLE);
+    hCrt = _open_osfhandle((long) handle_in, _O_TEXT);
+    FILE* hf_in = _fdopen(hCrt, "r");
+    setvbuf(hf_in, NULL, _IONBF, 128);
+    *stdin = *hf_in;
+
+    // use the console just like a normal one - printf(), getchar(), ...
+}
+*/
+
 /* the window procedure */
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
-	
-	/* set up a min-heap for adding new tasks */
-	
 	
 	switch(msg){
 		case WM_LBUTTONDOWN:
@@ -44,48 +76,79 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 				break;
 				case ID_ADD_TASK:
 				{
-					
 					HWND task = GetDlgItem(hwnd, IDC_TEXT);
 					HWND priority = GetDlgItem(hwnd, ID_GET_TASK_PRIORITY);
 					
 					TCHAR taskBuff[1024];
+					TCHAR priorityBuff[4];
 
-					GetWindowText(task, taskBuff, 1024);
+					GetWindowText(task, taskBuff, 100);
+					GetWindowText(priority, priorityBuff, 4);
+					int priority_num = atoi(priorityBuff);
 					
 					int i;
+					
 					for(i = 0; taskBuff[i] != '\0'; i++){
 						/* get to null terminator */
-					}
+					}				
 					
-					taskBuff[i++] = '\r';
+					/* append priority num to taskBuff just to check! remove this event later 
+					int j; //remove this later
+					taskBuff[i++] = ' '; //add a space
+					for(j = 0; priorityBuff[j] != '\0'; j++){
+							taskBuff[i++] = priorityBuff[j];
+					}
+					*/
+					
+					taskBuff[i++] = '\r'; 
 					taskBuff[i++] = '\n';
 					taskBuff[i] = '\0';
 					
 					/* put taskBuffer string in heap, along with priority number */
+					/* 
+					   taskBuff is what's displayed, i.e. "feed cats 10" (task, priority num)
+					   what goes in the heap is char * (the task) and an int (priority_num)
+					*/
+					
+					temp = createNewHashMap((char *)taskBuff, priority_num);
+					addToHeap(my_heap, temp);
+						
+					//fprintf(stdout, "the next task is: %s\n", getSmallest(my_heap)); 
+					//fprintf(stdout, "the heap has size of: %d\n", my_heap->size); 
 					
 					/* append to read-only display */
-					HWND hWndEditDisplay = GetDlgItem(hwnd, ID_TEXT_READONLY);
-					int length = GetWindowTextLength(hWndEditDisplay);
-					SendMessage(hWndEditDisplay, EM_SETSEL, length, length);
-					SendMessage(hWndEditDisplay, EM_REPLACESEL, 0, (LPARAM)TEXT(taskBuff));
+					//HWND hWndEditDisplay = GetDlgItem(hwnd, ID_TEXT_READONLY);
+					//int length = GetWindowTextLength(hWndEditDisplay);
+					
+					//SendMessage(hWndEditDisplay, EM_SETSEL, length, length);
+					//SendMessage(hWndEditDisplay, EM_REPLACESEL, 0, (LPARAM)TEXT(taskBuff));
 				}
 				break;
 				case ID_GET_TASK:
-				{
+				{	
 					/* append to read-only display */
 					HWND hWndEditDisplay = GetDlgItem(hwnd, ID_TEXT_READONLY);
 					int length = GetWindowTextLength(hWndEditDisplay);
+					
 					SendMessage(hWndEditDisplay, EM_SETSEL, length, length);
-					SendMessage(hWndEditDisplay, EM_REPLACESEL, 0, (LPARAM)TEXT(" replace this string\r\n"));
+					SendMessage(hWndEditDisplay, EM_REPLACESEL, 0, (LPARAM)TEXT(getSmallest(my_heap)));
+					
+					/* SendMessage(hWndEditDisplay, EM_REPLACESEL, 0, (LPARAM)TEXT(" replace this string\r\n")); */
 				}
 				break;
 			}
 		break;
 		case WM_CLOSE:
+		{
+			freeHeap(my_heap);
 			DestroyWindow(hwnd);
+		}
 		break;
 		case WM_DESTROY:
+		{
+			freeHeap(my_heap);
 			PostQuitMessage(0);
+		}
 		break;
 		default:
 			return DefWindowProc(hwnd, msg, wParam, lParam);
@@ -95,9 +158,17 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
 
+	/* console attached for debugging */
+	AllocConsole();
+	freopen( "CON", "w", stdout );
+	
 	WNDCLASSEX wc;
 	HWND hwnd;
 	MSG Msg;
+	
+	/* initialize heap */
+	init(&my_heap); /* notice the pointer to a heap pointer */
+	//fprintf(stdout, "the heap has size of: %d\n", my_heap->size);
 	
 	/* register the window class */
 	wc.cbSize = sizeof(WNDCLASSEX);
@@ -145,7 +216,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		NULL
 	);
 	
-	
 	/* make text box LABEL (HWND textInputLabel)*/
 	CreateWindow(
 		TEXT("STATIC"),
@@ -174,7 +244,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	/* prepopulate text input */
 	SetDlgItemText(hwnd, IDC_TEXT, "This is a string");
 	
-	
 	/* make text box LABEL FOR PRIORITY NUMBER (HWND textInputPriorityLabel) */
 	CreateWindow(
 		TEXT("STATIC"),
@@ -191,7 +260,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	CreateWindow(
 		TEXT("edit"),
 		TEXT(""),
-		WS_VISIBLE | WS_CHILD | WS_BORDER,
+		WS_VISIBLE | WS_CHILD | WS_BORDER | ES_NUMBER,
 		280, 50,  /* x, y coords */
 		30, 20, /* width, height */
 		hwnd,
@@ -240,7 +309,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		NULL
 	);
 	
-	
 	/* make read-only text box - TASKS TO DO (HWND displayTasks)*/
 	CreateWindow(
 		TEXT("edit"),
@@ -255,8 +323,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	);
 	/* prepopulate text input */
 	//SetDlgItemText(hwnd, ID_TEXT_READONLY, "This is a read-only section! ^_^\r\n");
-	
-	
 	
 	ShowWindow(hwnd, nCmdShow);
 	UpdateWindow(hwnd);
