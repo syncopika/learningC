@@ -26,11 +26,12 @@ typedef struct min_heap{
 
 
 /* function prototypes */
+void init(Heap **a_heap);
 HashMap *createNewHashMap(char *string, int priority);
 Heap *newHeap(void);
 void swap(HashMap **heap, int index1, int index2);
 void addToHeap(Heap *aHeap, HashMap *aHashMap);
-void getSmallest(Heap *aHeap);
+char *getSmallest(Heap *aHeap);
 void removeSmallest(Heap *aHeap);
 void freeHeap(Heap *h);
 void printHeap(Heap *h);
