@@ -18,7 +18,7 @@ gcc -Wall -mwindows testgui.c gui.o -o testgui.exe
 
 const char g_szClassName[] = "myWindowClass";
 
-static Heap *my_heap; /* this variable does not stay updated! */
+static Heap *my_heap; 
 static HashMap *temp;
 
 /* the window procedure */
