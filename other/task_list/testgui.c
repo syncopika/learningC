@@ -14,7 +14,7 @@ gcc -Wall -mwindows testgui.c gui.o -o testgui.exe
 #include <stdio.h>
 #include <stdlib.h>
 #include "resource.h"
-#include "heap2.h"
+#include "heap.h"
 
 const char g_szClassName[] = "myWindowClass";
 
