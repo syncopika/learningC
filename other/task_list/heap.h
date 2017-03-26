@@ -15,12 +15,11 @@ typedef struct min_heap{
 	
 	   for now, it should be a size of 100 indices
 	   only one slot for one priority number, no duplicates
-	   remember: heap is a hashmap array 
+	   remember: heap is an array of hashmap pointers 
 	   
 	*/
 	HashMap **theHeap; 
 	int size;
-	int currIndex;
 
 } Heap;
 
