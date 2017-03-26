@@ -7,7 +7,7 @@ https://cboard.cprogramming.com/windows-programming/53577-displaying-text-number
 
 to compile:
 windres testgui.rc gui.o  //set up resource file 
-gcc -Wall -mwindows testgui.c gui.o -o testgui.exe
+gcc -Wall -mwindows testgui.c heap.c gui.o -o testgui.exe
 */
 
 #include <windows.h>
@@ -63,14 +63,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 						/* get to null terminator */
 					}				
 					
-					/* append priority num to taskBuff just to check! remove this event later 
-					int j; //remove this later
-					taskBuff[i++] = ' '; //add a space
-					for(j = 0; priorityBuff[j] != '\0'; j++){
-							taskBuff[i++] = priorityBuff[j];
-					}
-					*/
-					
 					taskBuff[i++] = '\r'; 
 					taskBuff[i++] = '\n';
 					taskBuff[i] = '\0';
@@ -104,7 +96,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 					SendMessage(hWndEditDisplay, EM_SETSEL, length, length);
 					SendMessage(hWndEditDisplay, EM_REPLACESEL, 0, (LPARAM)TEXT(getSmallest(my_heap)));
 					
-					/* SendMessage(hWndEditDisplay, EM_REPLACESEL, 0, (LPARAM)TEXT(" replace this string\r\n")); */
+					/* remove smallest */
+					removeSmallest(my_heap);
 				}
 				break;
 			}
