@@ -4,8 +4,6 @@
 	hashmaps will be put in the queue based on value
 	key - a char* array (string) indicating a certain activity (i.e. "do homework")
 	value - a number from 1-100, 1 = highest priority, 100 = lowest priority
-	
-	queue only has two methods - add and getSmallest
 
 */
 
@@ -28,7 +26,7 @@ HashMap *createNewHashMap(char *string, int priority){
 		exit(1);
 	}
 	
-	newHash->key = malloc(sizeof(string) + 1);
+	newHash->key = malloc(strlen(string) + 1);
 	
 	if(newHash->key == NULL){
 		fprintf(stderr, "hash map could not be created.\n");
@@ -50,7 +48,6 @@ Heap *newHeap(void){
 	Heap *newHeap = calloc(1, sizeof(Heap));
 	newHeap->theHeap = calloc(100, sizeof(HashMap *)); /* array of hashmap pointers */
 	newHeap->size = 0;
-	newHeap->currIndex = 0;
 	
 	return newHeap;
 }
@@ -86,7 +83,7 @@ void addToHeap(Heap *aHeap, HashMap *aHashMap){
 	
 	/* access the heap */
 	HashMap **heapPointer = aHeap->theHeap;
-	heapPointer[aHeap->currIndex] = aHashMap;
+	heapPointer[aHeap->size] = aHashMap;
 	
 	/* 
 		bubble-up procedure for newly added hashmap as needed. 
@@ -100,8 +97,8 @@ void addToHeap(Heap *aHeap, HashMap *aHashMap){
 		keep doing that process if not
 	*/
 	
-	int curIndex = aHeap->currIndex;
-	int parentIndex = (aHeap->currIndex - 1) / 2;
+	int curIndex = aHeap->size;
+	int parentIndex = (aHeap->size - 1) / 2;
 	
 	while(heapPointer[parentIndex]->value > heapPointer[curIndex]->value){
 	
@@ -113,9 +110,8 @@ void addToHeap(Heap *aHeap, HashMap *aHashMap){
 	
 	}
 	
-	/* increment size and currIndex for the next hash map */
-	aHeap->size++;
-	aHeap->currIndex++;
+	/* increment size for the next hash map */
+	(aHeap->size)++;
 }
 
 /*
@@ -123,6 +119,11 @@ void addToHeap(Heap *aHeap, HashMap *aHashMap){
 	doesn't change the heap.
 */
 char *getSmallest(Heap *aHeap){
+	
+	if(aHeap->size == 0){
+		return NULL;
+	}
+	
 	return aHeap->theHeap[0]->key;
 }
 
@@ -130,19 +131,29 @@ char *getSmallest(Heap *aHeap){
 	removes the smallest hashmap from the heap (i.e. heap[0])
 */
 void removeSmallest(Heap *aHeap){
+	
+	if(aHeap->size == 0){
+		return;
+	}
+	
 	/* remove the smallest - free memory from first hashmap in heap */
+	free((aHeap->theHeap)[0]->key);
 	free((aHeap->theHeap)[0]);
 
 	/* reassign 0 index to be the last hashmap in the heap */
-	(aHeap->theHeap)[0] = (aHeap->theHeap)[aHeap->currIndex - 1];
-	(aHeap->theHeap)[aHeap->currIndex - 1] = NULL;
+	(aHeap->theHeap)[0] = (aHeap->theHeap)[aHeap->size - 1];
+	(aHeap->theHeap)[aHeap->size - 1] = NULL;
+	
+	(aHeap->size)--;
 	
 	/* then bubble-down so the hashmap at index 0 will go to the right place*/ 
 	int i;
-	for(i = 0; ((2*i)+2) < aHeap->currIndex - 1; i++){
-		HashMap *smallestChild = NULL;
+	
+	for(i = 0; ((2*i)+2) < aHeap->size; i++){
+		HashMap *smallestChild;
 		int smallestChildIndex = 2*i + 1;
 		
+		/* figure out the smallest between left and right child based on value number */
 		if((aHeap->theHeap)[i*2 + 1]->value > (aHeap->theHeap)[i*2 + 2]->value){
 			smallestChild = (aHeap->theHeap)[2*i + 2];
 			smallestChildIndex = 2*i + 2;
@@ -155,17 +166,13 @@ void removeSmallest(Heap *aHeap){
 			swap(aHeap->theHeap, i, smallestChildIndex);
 		} 
 	}
-	/* decrease currIndex */
-	(aHeap->currIndex)--;
-	/* decrease size */
-	(aHeap->size)--;
-}
 
+}
 
 void freeHeap(Heap *h){
 	
 	int i;
-	for(i = 0; i < h->currIndex; i++){
+	for(i = 0; i < h->size; i++){
 		free((h->theHeap)[i]->key);
 		free((h->theHeap)[i]);
 	}
@@ -176,7 +183,7 @@ void freeHeap(Heap *h){
 void printHeap(Heap *h){
 	
 	int i = 0;
-	for(i = 0; i < h->currIndex; i++){
+	for(i = 0; i < h->size; i++){
 		printf("to do: %s, priority number: %d\n", (h->theHeap)[i]->key, (h->theHeap)[i]->value);
 	}
 }
@@ -200,13 +207,15 @@ int main(void){
 	
 	printHeap(heap1);
 	
-	getSmallest(heap1);
+	printf("the next task is: %s\n", getSmallest(heap1));
 	removeSmallest(heap1);
 	
 	printHeap(heap1);
 	printf("the size of the heap is now: %d\n", heap1->size);
 	
 	freeHeap(heap1);
+	
+	print_memory_leaks();
 	
 	return 0;
 }
