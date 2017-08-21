@@ -17,6 +17,12 @@ char *compress(char *string){
 	int currIndex = 0;
 	char *compressedString = calloc(1, 1); 
 	
+	/* check for calloc fail */
+	if(compressedString == NULL){
+		printf("calloc fail. \n");
+		exit(EXIT_FAILURE);
+	}
+	
 	/* need to read the null-term to count the last char */
 	for(i = 0; i <= len(string); i++){
 		/* for first char in string */
@@ -26,11 +32,18 @@ char *compress(char *string){
 		}else{
 			if(string[i] != currChar){
 				compressedString = realloc(compressedString, currIndex + 3);
+				
+				/* check for calloc fail */
+				if(compressedString == NULL){
+					printf("calloc fail. \n");
+					exit(EXIT_FAILURE);
+				}
+				
 				sprintf(compressedString, "%s%c%d", compressedString, currChar, count);
 				/* printf("compressed str: %s\n", compressedString); */
 				currIndex += 2;
 				currChar = string[i]; 	/* reset currChar */
-				count = 1; 				/* reset count */
+				count = 1; 		/* reset count */
 			}else{
 				count++;
 			}
