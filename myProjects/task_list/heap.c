@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include "heap.h"
 
 /*
@@ -18,6 +19,8 @@
 	
 */
 HashMap *createNewHashMap(char *string, int priority){
+
+	assert(priority >= 1 && priority <= 100);
 
 	HashMap *newHash = calloc(1, sizeof(HashMap));
 	
@@ -89,7 +92,7 @@ void addToHeap(Heap *aHeap, HashMap *aHashMap){
 		bubble-up procedure for newly added hashmap as needed. 
 		important formulas:
 		
-		parent index: (i-1) / 2
+		parent index: floor((i-1) / 2)
 		left child index: 2i + 1
 		right child index: 2i + 2
 		
@@ -149,17 +152,22 @@ void removeSmallest(Heap *aHeap){
 	/* then bubble-down so the hashmap at index 0 will go to the right place*/ 
 	int i;
 	
-	for(i = 0; ((2*i)+2) < aHeap->size; i++){
+	/* check to see if at least the left child exists */
+	for(i = 0; ((2*i)+1) < aHeap->size; i++){
 		HashMap *smallestChild;
 		int smallestChildIndex = 2*i + 1;
 		
-		/* figure out the smallest between left and right child based on value number */
-		if((aHeap->theHeap)[i*2 + 1]->value > (aHeap->theHeap)[i*2 + 2]->value){
-			smallestChild = (aHeap->theHeap)[2*i + 2];
-			smallestChildIndex = 2*i + 2;
+		/* then check to see if the right child exists (it might not) */
+		if((2*i)+2 < aHeap->size){
+			/* if the index of the right child is still in range, compare it! */
+			if((aHeap->theHeap)[i*2 + 1]->value > (aHeap->theHeap)[i*2 + 2]->value){
+				smallestChild = (aHeap->theHeap)[2*i + 2];
+				smallestChildIndex = 2*i + 2;
+			}else{
+				smallestChild = (aHeap->theHeap)[2*i + 1];
+			}
 		}else{
 			smallestChild = (aHeap->theHeap)[2*i + 1];
-			smallestChildIndex = 2*i + 1;
 		}
 		
 		if((aHeap->theHeap)[i]->value > smallestChild->value){
@@ -188,38 +196,54 @@ void printHeap(Heap *h){
 	}
 }
 
-/*
+
 int main(void){
 	
 	Heap *heap1 = newHeap();
 	
-	HashMap *hm1 = createNewHashMap("do homework", 5);
-	HashMap *hm2 = createNewHashMap("eat food", 4);
-	HashMap *hm3 = createNewHashMap("go to sleep", 3);
-	HashMap *hm4 = createNewHashMap("play with cats", 2);
-	HashMap *hm5 = createNewHashMap("make music", 1);
+	HashMap *hm1 = createNewHashMap("do homework", 3);
+	HashMap *hm2 = createNewHashMap("eat food", 6);
+	HashMap *hm3 = createNewHashMap("go to sleep", 2);
+	HashMap *hm4 = createNewHashMap("play with cats", 7);
+	HashMap *hm5 = createNewHashMap("stare into space", 8);
+	HashMap *hm6 = createNewHashMap("make music", 1);
+	//HashMap *hm7 = createNewHashMap("make music again", 4);
 	
 	addToHeap(heap1, hm1);
-	addToHeap(heap1, hm4);
-	addToHeap(heap1, hm3);
-	addToHeap(heap1, hm5);
 	addToHeap(heap1, hm2);
+	addToHeap(heap1, hm3);
+	addToHeap(heap1, hm4);
+	addToHeap(heap1, hm5);
+	addToHeap(heap1, hm6);
+	//addToHeap(heap1, hm7);
 	
 	printHeap(heap1);
 	
 	printf("the next task is: %s\n", getSmallest(heap1));
 	removeSmallest(heap1);
+	printf("the next task is: %s\n", getSmallest(heap1));
+	removeSmallest(heap1);
+	printf("the next task is: %s\n", getSmallest(heap1));
+	removeSmallest(heap1);
+	printf("the next task is: %s\n", getSmallest(heap1));
+	removeSmallest(heap1);
+	printf("the next task is: %s\n", getSmallest(heap1));
+	removeSmallest(heap1);
+	printf("the next task is: %s\n", getSmallest(heap1));
+	removeSmallest(heap1);
+	//printf("the next task is: %s\n", getSmallest(heap1));
+	//removeSmallest(heap1);
 	
-	printHeap(heap1);
-	printf("the size of the heap is now: %d\n", heap1->size);
+	//printHeap(heap1);
+	//printf("the size of the heap is now: %d\n", heap1->size);
 	
 	freeHeap(heap1);
 	
-	print_memory_leaks();
+	//print_memory_leaks();
 	
 	return 0;
 }
-*/
+
 
 
 
