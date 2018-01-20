@@ -127,8 +127,8 @@ void addToHeap(Heap *aHeap, HashMap *aHashMap){
 	}
 	
 	/* increment size and currIndex for the next hash map */
-	aHeap->size++;
-	aHeap->currIndex++;
+	(aHeap->size)++;
+	(aHeap->currIndex)++;
 }
 
 /*
@@ -150,28 +150,38 @@ void removeSmallest(Heap *aHeap){
 	(aHeap->theHeap)[0] = (aHeap->theHeap)[aHeap->currIndex - 1];
 	(aHeap->theHeap)[aHeap->currIndex - 1] = NULL;
 	
+	/* decrease size */
+	(aHeap->size)--;
+	
 	/* then bubble-down so the hashmap at index 0 will go to the right place*/ 
 	int i;
-	for(i = 0; ((2*i)+2) < aHeap->currIndex - 1; i++){
+	
+	/* check to see if at least the left child exists */
+	for(i = 0; ((2*i)+1) < aHeap->size; i++){
 		HashMap *smallestChild = NULL;
 		int smallestChildIndex = 2*i + 1;
 		
-		if((aHeap->theHeap)[i*2 + 1]->value > (aHeap->theHeap)[i*2 + 2]->value){
-			smallestChild = (aHeap->theHeap)[2*i + 2];
-			smallestChildIndex = 2*i + 2;
+		/* then check to see if the right child exists (it might not) */
+		if((2*i)+2 < aHeap->size){
+			/* if the index of the right child is still in range, compare it! */
+			if((aHeap->theHeap)[i*2 + 1]->value > (aHeap->theHeap)[2*i + 2]->value){
+				smallestChild = (aHeap->theHeap)[2*i + 2];
+				smallestChildIndex = 2*i + 2;
+			}else{
+				smallestChild = (aHeap->theHeap)[2*i + 1];
+			}
 		}else{
 			smallestChild = (aHeap->theHeap)[2*i + 1];
-			smallestChildIndex = 2*i + 1;
 		}
 		
 		if((aHeap->theHeap)[i]->value > smallestChild->value){
 			swap(aHeap->theHeap, i, smallestChildIndex);
 		} 
 	}
+
 	/* decrease currIndex */
 	(aHeap->currIndex)--;
-	/* decrease size */
-	(aHeap->size)--;
+	
 }
 
 
